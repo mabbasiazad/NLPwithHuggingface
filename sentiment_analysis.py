@@ -43,7 +43,7 @@ model = AutoModelForSequenceClassification.from_pretrained(checkpoint)
 
 #testing the model
 outputs = model(**inputs)
-print(outputs.logits)
+print(outputs.logits) 
 
 #post processing the output
 import torch
@@ -51,5 +51,9 @@ predictions = torch.nn.functional.softmax(outputs.logits, dim=-1)
 print(predictions)
 
 print(model.config.id2label)  #using id2labe attribute of the model config
+
+
+model.save_pretrained("./myModels") #save the model in the directory
+
 
 
