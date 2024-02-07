@@ -14,5 +14,44 @@ print(drug_dataset)
 for split in drug_dataset.keys():
     assert len(drug_dataset[split]) == len(drug_dataset[split].unique("patient_id"))
 
-#new feature added to the main program
-    #another feature added
+drug_dataset = drug_dataset.filter(lambda x: x["condition"] is not None)
+
+def lowercase_condition(example):
+    return {"condition": example["condition"].lower()}
+
+# modifying current column
+drug_dataset = drug_dataset.map(lowercase_condition)
+
+print(drug_dataset["train"]["condition"][:3])
+
+# creating a new column
+def compute_review_length(example):
+    return {"review_length": len(example["review"].split())}
+
+drug_dataset = drug_dataset.map(compute_review_length) 
+print(drug_dataset)
+
+# print(drug_dataset["train"].sort("review_length")[:2])
+print(drug_dataset.num_rows)
+
+import html
+
+text = "I&#039;m a transformer called BERT"
+print(html.unescape(text))
+
+#cleaning the review column from html character codes
+drug_dataset = drug_dataset.map(lambda x: {"review": html.unescape(x["review"])})
+
+# map code super power
+from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
+
+
+def tokenize_function(examples):
+    return tokenizer(examples["review"], truncation=True)
+
+tokenized_dataset = drug_dataset.map(tokenize_function, batched=True)
+print("============")
+print(drug_dataset)
+print(tokenized_dataset)
